@@ -4,21 +4,19 @@ from aiogram import Router
 from states import Registration
 from keyboards import get_confirmation_keyboard
 from config import ADMIN_GROUP_ID
+from aiogram import Bot
 
 router = Router()
 
 
 @router.message(Registration.waiting_for_audio, F.audio | F.voice)
 async def process_audio(message: types.Message, state: FSMContext):
-
     audio_file = message.voice if message.voice else message.audio
     if not audio_file:
         await message.answer("Iltimos, audio yoki voice fayl yuboring.")
         return
 
-
     await state.update_data(audio_file_id=audio_file.file_id)
-
 
     confirmation_text = "Yozilgan audio faylni yubormoqchimisiz? Agar tasdiqlasangiz, audio bot admin guruhiga yuboriladi."
     keyboard = get_confirmation_keyboard()
@@ -27,7 +25,7 @@ async def process_audio(message: types.Message, state: FSMContext):
 
 
 @router.callback_query(F.filter(lambda call: call.data and call.data.startswith("audio_confirm")))
-async def audio_confirmation_handler(callback: types.CallbackQuery, state: FSMContext, bot: types.Bot):
+async def audio_confirmation_handler(callback: types.CallbackQuery, state: FSMContext, bot: Bot):
     response = callback.data.split(":")[1]
     if response == "yes":
 
@@ -46,7 +44,6 @@ async def audio_confirmation_handler(callback: types.CallbackQuery, state: FSMCo
         pdf_info = f"PDF ID: {pdf_id}"
         user_info = f"Foydalanuvchi: {name} {family}\nUsername: {callback.from_user.username}\nTelefon: {phone}"
         caption = f"{user_info}\n{pdf_info}"
-
 
         await bot.send_message(chat_id=ADMIN_GROUP_ID, text=caption)
 

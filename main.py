@@ -1,15 +1,15 @@
 import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
-
+from aiogram.client.bot import DefaultBotProperties
 from config import BOT_TOKEN
 from handlers import registration, pdf_handler, audio_handler
 
 
 async def main():
     storage = MemoryStorage()
-
-    bot = Bot(token=BOT_TOKEN, parse_mode="HTML")
+    bot_properties = DefaultBotProperties(parse_mode="HTML")
+    bot = Bot(token=BOT_TOKEN, default=bot_properties)
     dp = Dispatcher(storage=storage)
 
     dp.include_router(registration.router)
