@@ -50,13 +50,15 @@ async def process_phone(message: types.Message, state: FSMContext):
 @router.callback_query(F.data.startswith("pdf_select:"))
 async def process_pdf_selection(callback: CallbackQuery, state: FSMContext):
     pdf_id = callback.data.split(":")[1]
-
     if pdf_id in PDF_FILES:
         file_info = PDF_FILES[pdf_id]
+        await state.update_data(pdf_id=pdf_id)
         await callback.message.answer_document(
             document=FSInputFile(file_info["file_path"]),
             caption=f"📄 {file_info['file_name']}"
         )
+        await callback.message.answer("Iltimos, tanlangan PDF asosida audio yozib yuboring:")
+        await state.set_state(Registration.waiting_for_audio)
     else:
         await callback.message.answer("❌ Fayl topilmadi.")
 
