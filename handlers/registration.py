@@ -2,6 +2,8 @@ from aiogram import types, F
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command
 from aiogram import Router
+from aiogram.types import CallbackQuery, FSInputFile
+
 from states import Registration
 from config import PDF_FILES
 from keyboards import get_pdf_selection_keyboard
@@ -43,3 +45,19 @@ async def process_phone(message: types.Message, state: FSMContext):
     keyboard = get_pdf_selection_keyboard(PDF_FILES)
     await message.answer(terms, reply_markup=keyboard)
     await state.set_state(Registration.waiting_for_pdf_choice)
+
+
+@router.callback_query(F.data.startswith("pdf_select:"))
+async def process_pdf_selection(callback: CallbackQuery, state: FSMContext):
+    pdf_id = callback.data.split(":")[1]
+
+    if pdf_id in PDF_FILES:
+        file_info = PDF_FILES[pdf_id]
+        await callback.message.answer_document(
+            document=FSInputFile(file_info["file_path"]),
+            caption=f"📄 {file_info['file_name']}"
+        )
+    else:
+        await callback.message.answer("❌ Fayl topilmadi.")
+
+    await callback.answer()

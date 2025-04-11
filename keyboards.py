@@ -3,8 +3,8 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 def get_pdf_selection_keyboard(pdf_files: dict) -> InlineKeyboardMarkup:
     buttons = [
-        [InlineKeyboardButton(text=f"PDF {pdf_id}", callback_data=f"pdf_select:{pdf_id}")]
-        for pdf_id in pdf_files
+        [InlineKeyboardButton(text=file["file_name"], callback_data=f"pdf_select:{pdf_id}")]
+        for pdf_id, file in pdf_files.items()
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
