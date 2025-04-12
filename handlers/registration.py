@@ -27,7 +27,7 @@ async def process_name(message: types.Message, state: FSMContext):
 @router.message(Registration.waiting_for_family)
 async def process_family(message: types.Message, state: FSMContext):
     await state.update_data(family=message.text)
-    await message.answer("Telefon raqamingizni kiriting (raqam formatida):")
+    await message.answer("Telefon raqamingizni kiriting (misol uchun : +998931234567):")
     await state.set_state(Registration.waiting_for_phone)
 
 
