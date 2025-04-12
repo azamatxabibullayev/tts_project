@@ -3,6 +3,8 @@ from aiogram.fsm.context import FSMContext
 from states import Registration
 from keyboards import get_confirmation_keyboard
 from config import ADMIN_GROUP_ID
+from aiogram.utils.markdown import hlink
+from config import PDF_FILES
 
 router = Router()
 
@@ -42,15 +44,27 @@ async def audio_confirmation_handler(callback: types.CallbackQuery, state: FSMCo
             await state.clear()
             return
 
-        pdf_info = f"PDF ID: {pdf_id}"
-        user_info = f"Foydalanuvchi: {name} {family}\nUsername: @{callback.from_user.username}\nTelefon: {phone}"
-        caption = f"{user_info}\n{pdf_info}"
+        pdf_entry = PDF_FILES.get(pdf_id, {})
+        pdf_name = pdf_entry.get("file_name", "Nomaʼlum PDF")
+
+        user = callback.from_user
+        if user.username:
+            user_display = f"@{user.username}"
+        else:
+            user_display = hlink("Profilga havola", f"tg://user?id={user.id}")
+
+        caption = (
+            f"<b>Foydalanuvchi:</b> {name} {family}\n"
+            f"<b>Username:</b> {user_display}\n"
+            f"<b>Telefon:</b> {phone}\n"
+            f"<b>Tanlangan PDF:</b> {pdf_name} (ID: {pdf_id})"
+        )
 
         try:
             if callback.message.reply_to_message and callback.message.reply_to_message.audio:
-                await bot.send_audio(chat_id=ADMIN_GROUP_ID, audio=audio_file_id, caption=caption)
+                await bot.send_audio(chat_id=ADMIN_GROUP_ID, audio=audio_file_id, caption=caption, parse_mode="HTML")
             else:
-                await bot.send_voice(chat_id=ADMIN_GROUP_ID, voice=audio_file_id, caption=caption)
+                await bot.send_voice(chat_id=ADMIN_GROUP_ID, voice=audio_file_id, caption=caption, parse_mode="HTML")
         except Exception as e:
             await bot.send_message(chat_id=ADMIN_GROUP_ID, text=f"Audio yuborishda xatolik: {e}")
 
