@@ -13,7 +13,11 @@ router = Router()
 
 @router.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext):
-    await message.answer("Assalomu alaykum! Iltimos, ismingizni kiriting:")
+    await message.answer(
+        "👋 <b>Assalomu alaykum!</b>\n\n"
+        "Siz Ushbu Bot yordamida o‘z ovozingiz bilan loyiha rivojiga hissa qo‘shishingiz mumkin.\n\n"
+        "📝 Ishni boshlash uchun, iltimos, ismingizni kiriting:"
+    )
     await state.set_state(Registration.waiting_for_name)
 
 
@@ -27,7 +31,7 @@ async def process_name(message: types.Message, state: FSMContext):
 @router.message(Registration.waiting_for_family)
 async def process_family(message: types.Message, state: FSMContext):
     await state.update_data(family=message.text)
-    await message.answer("Telefon raqamingizni kiriting (misol uchun : +998931234567):")
+    await message.answer("Telefon raqamingizni kiriting (misol uchun : +998901234567):")
     await state.set_state(Registration.waiting_for_phone)
 
 
@@ -36,10 +40,10 @@ async def process_phone(message: types.Message, state: FSMContext):
     await state.update_data(phone=message.text)
 
     terms = (
-        "Quyidagi qonun-qoidalar bilan tanishing:\n"
-        "1. Siz shaxsiy ma'lumotlaringizni to'g'ri kiritishingiz kerak.\n"
-        "2. Hujjatlarni dona dona qilib, ifodali o'qish lozim.\n\n"
-        "Quyidagi PDF hujjatlarni tanlang:"
+        "Quyidagi qonun-qoidalar bilan tanishing:\n\n"
+        "1. Siz shaxsiy ma'lumotlaringizni to'g'ri kiritishingiz kerak. Bu agar sizning ovozingiz tanlansa admin siz bilan bog'lana olishini kafolatlaydi.\n"
+        "2. Hujjatlarni dona-dona qilib, har bir jumla va bandga alohida e’tibor qaratgan holda, tushunarli, aniqlik bilan va ifodali tarzda o‘qish zarur. Bu hujjatlarning asl mazmunini to‘liq anglash va to‘g‘ri tushunishga xizmat qiladi.\n\n"
+        "Quyidagi PDF hujjatlardan birini tanlang:"
     )
 
     keyboard = get_pdf_selection_keyboard(PDF_FILES)
